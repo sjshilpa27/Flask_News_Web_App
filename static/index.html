@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <!-- Load d3-cloud -->
+    <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+    <script src="script_cloud.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+
+    <script>
+        function load()
+        {   
+
+            
+            let form = document.getElementById( "searchform" );
+            form.addEventListener( "submit", function ( event ) {
+                event.preventDefault();
+
+                fetchresults();
+            } );
+
+
+            //Headline
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/topheadlines", true);
+            var headlines = []
+            xhr.onload = function (e) {
+              if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                  // console.log(xhr.responseText);
+                  showSlides(JSON.parse(xhr.responseText));
+                } else {
+                  console.error(xhr.statusText);
+                }
+              }
+            };
+            xhr.onerror = function (e) {
+              console.error(xhr.statusText);
+            };
+            xhr.send(null);
+
+            //CNN
+            var cnnxhr = new XMLHttpRequest();
+            var params ="src=cnn"
+            cnnxhr.open("GET", "/topheadlines?"+params, true);
+            var cnnheadlines = []
+            cnnxhr.onload = function (e) {
+              if (cnnxhr.readyState === 4) {
+                if (cnnxhr.status === 200) {
+                  // console.log(cnnxhr.responseText);
+                  // alert(cnnxhr.responseText);
+                  showcnncards(JSON.parse(cnnxhr.responseText));
+                  // showSlides(JSON.parse(cnnxhr.responseText));
+                } else {
+                  console.error(cnnxhr.statusText);
+                }
+              }
+            };
+            cnnxhr.onerror = function (e) {
+              console.error(cnnxhr.statusText);
+            };
+            cnnxhr.send(null);
+
+
+            //FOX
+            var foxxhr = new XMLHttpRequest();
+            var params ="src=fox-news"
+            foxxhr.open("GET", "/topheadlines?"+params, true);
+            var foxheadlines = []
+            foxxhr.onload = function (e) {
+              if (foxxhr.readyState === 4) {
+                if (foxxhr.status === 200) {
+                  console.log(foxxhr.responseText);
+                  // alert(foxxhr.responseText);
+                  showfoxcards(JSON.parse(foxxhr.responseText));
+                  // showSlides(JSON.parse(cnnxhr.responseText));
+                } else {
+                  console.error(foxxhr.statusText);
+                }
+              }
+            };
+            foxxhr.onerror = function (e) {
+              console.error(foxxhr.statusText);
+            };
+            foxxhr.send(null);
+
+
+            //DYNAMIO SRCS
+            var srcxhr = new XMLHttpRequest();
+            srcxhr.open("GET", "/dynamicsources", true);
+            var headlines = []
+            srcxhr.onload = function (e) {
+              if (srcxhr.readyState === 4) {
+                if (srcxhr.status === 200) {
+                  console.log(srcxhr.responseText);
+                  fillSources(JSON.parse(srcxhr.responseText));
+                } else {
+                  console.error(srcxhr.statusText);
+                }
+              }
+            };
+            srcxhr.onerror = function (e) {
+              console.error(srcxhr.statusText);
+            };
+            srcxhr.send(null);
+
+
+            // List of words
+
+
+            var xmlhttp = new XMLHttpRequest();
+            var url = "/wordcloud";
+
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var myArr = JSON.parse(this.responseText);
+                    // alert(myArr);
+                    loadWordCloud(myArr);
+                }
+            };
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+
+            function loadWordCloud(myWords) {
+//            alert(myWords);
+                var layout = d3.layout.cloud()
+                .size([327, 280])
+                .words(myWords.map(function (d) {
+                    return {text: d.word, size: d.size};
+                }))
+                .padding(5)
+                .rotate(function() { return ~~(Math.random() * 2) * 90; })
+                .font("Impact")
+                .fontSize(function(d) { return d.size; })
+                .on("end", draw);
+
+            layout.start();
+
+                function draw(words) {
+                  d3.select("#cloud").append("svg")
+                      .attr("width", layout.size()[0])
+                      .attr("height", layout.size()[1])
+                    .append("g")
+                      .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                    .selectAll("text")
+                      .data(words)
+                    .enter().append("text")
+                      .style("font-size", function(d) { return d.size + "px"; })
+                      .style("font-family", "Impact")
+                      .attr("text-anchor", "middle")
+                      .attr("transform", function(d) {
+                        return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                      })
+                      .text(function(d) { return d.text; });
+                }
+            }
+            function createCloud(myWords) {
+                var out = "";
+
+                // set the dimensions and margins of the graph
+                var margin = {top: 10, right: 10, bottom: 10, left: 10},
+                    width = 450 - margin.left - margin.right,
+                    height = 450 - margin.top - margin.bottom;
+
+                // append the svg object to the body of the page
+                var svg = d3.select("#cloud").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                    .attr("transform",
+                          "translate(" + margin.left + "," + margin.top + ")");
+
+                // Constructs a new cloud layout instance. It run an algorithm to find the position of words that suits your requirements
+                // Wordcloud features that are different from one word to the other must be here
+                var layout = d3.layout.cloud()
+                  .size([width, height])
+                  .words(myWords.map(function(d) { return {text: d.word, size:d.size}; }))
+                  .padding(1)        //space between words
+                  .rotate(function() { return ~~(Math.random() * 2) * 90; })
+                  .fontSize(function(d) { return d.size; })      // font size of words
+                  .on("end", draw);
+                layout.start();
+
+                // This function takes the output of 'layout' above and draw the words
+                // Wordcloud features that are THE SAME from one word to the other can be here
+                function draw(words) {
+                  svg
+                    .append("g")
+                      .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                      .selectAll("text")
+                        .data(words)
+                      .enter().append("text")
+                        .style("font-size", function(d) { return d.size; })
+                        .style("fill", "#69b3a2")
+                        .attr("text-anchor", "middle")
+                        .style("font-family", "Impact")
+                        .attr("transform", function(d) {
+                          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                        })
+                        .text(function(d) { return d.text; });
+                }
+               }
+
+
+
+
+
+
+
+
+
+            function showSlides(json_data)
+            {
+                // alert(JSON.stringify(json_data));
+                var topnews = document.getElementById("topnews");
+                // alert(json_data.length);
+                var i ;
+                for(i=0; i<json_data.length ; i++)
+                {
+                    var img = document.createElement("img");
+                    img.setAttribute("src",json_data[i]["urlToImage"]);
+                    var h2 = document.createElement("h2");
+                    var t = document.createTextNode(json_data[i]["title"]);
+                    h2.appendChild(t);
+                    var desc = document.createElement("p");
+                    t = document.createTextNode(json_data[i]["description"]);
+                    desc.appendChild(t);
+                    var txtblock = document.createElement("div");
+                    txtblock.classList.add("text-block");
+                    txtblock.appendChild(h2);
+                    txtblock.appendChild(desc);
+                    var slide = document.createElement("div");
+                    slide.classList.add("mySlides");
+                    slide.appendChild(img);
+                    slide.appendChild(txtblock);
+                    slide.setAttribute("onclick","window.open(\""+json_data[i].url+"\",\"_blank\")");
+                    topnews.appendChild(slide);
+                }
+                //alert(i);
+                rotateSlides();
+            }
+
+
+            var slideIndex = 0;
+            function rotateSlides()
+            {
+              var i;
+              var slides = document.getElementsByClassName("mySlides");
+              // var dots = document.getElementsByClassName("dot");
+              //alert(slides.length);
+              for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+              }
+              slideIndex++;
+              if (slideIndex > slides.length) {slideIndex = 1}
+              // for (i = 0; i < dots.length; i++) {
+              //   dots[i].className = dots[i].className.replace(" active", "");
+              // }
+              slides[slideIndex-1].style.display = "block";
+              setTimeout(rotateSlides, 2000); // Change image every 2 seconds
+            }
+
+
+
+            function showcnncards(json_data) {
+                // alert(JSON.stringify(json_data));
+                var cnntopnews = document.getElementById("cnnrow");
+                // alert(json_data.length);
+                var i ;
+                for(i=0; i<json_data.length ; i++)
+                {
+                    // var column = document.createElement("div");
+                    // column.classList.add("column");
+                    var card = document.createElement("div");
+                    card.classList.add("card");
+                    // column.appendChild(card);
+
+                    var img = document.createElement("img");
+                    img.setAttribute("src",json_data[i]["urlToImage"]);
+                    var h2 = document.createElement("h3");
+                    var t = document.createTextNode(json_data[i]["title"]);
+                    h2.appendChild(t);
+                    var desc = document.createElement("p");
+                    t = document.createTextNode(json_data[i]["description"]);
+                    desc.appendChild(t);
+
+                    card.appendChild(img);
+                    card.appendChild(h2);
+                    card.appendChild(desc);
+                    card.setAttribute("onclick","window.open(\""+json_data[i].url+"\",\"_blank\")");
+                    cnntopnews.appendChild(card);
+                }
+                //alert(i);
+
+            }
+
+
+            function showfoxcards(fox_json_data)
+            {
+                // alert(JSON.stringify(json_data));
+                var foxtopnews = document.getElementById("foxrow");
+                // alert(fox_json_data.length);
+                var i ;
+                for(i=0; i<fox_json_data.length ; i++)
+                {
+                    
+                    var card = document.createElement("div");
+                    card.classList.add("card");
+                    
+
+                    var img = document.createElement("img");
+                    img.setAttribute("src",fox_json_data[i]["urlToImage"]);
+                    var h2 = document.createElement("h3");
+                    var t = document.createTextNode(fox_json_data[i]["title"]);
+                    h2.appendChild(t);
+                    var desc = document.createElement("p");
+                    t = document.createTextNode(fox_json_data[i]["description"]);
+                    desc.appendChild(t);
+
+                    card.appendChild(img);
+                    card.appendChild(h2);
+                    card.appendChild(desc);
+                    card.setAttribute("onclick","window.open(\""+fox_json_data[i].url+"\",\"_blank\")");
+                    foxtopnews.appendChild(card);
+                }
+                //alert(i);
+
+            }
+
+        }
+
+
+        function expand(card){
+            card.classList.add("active");
+            var children = card.children;
+            var content = children[1];
+            children[2].style.display="block";
+            var todisplay = content.getElementsByClassName("removable");
+            for (var i = todisplay.length - 1; i >= 0; i--) {
+                todisplay[i].style.display="block";
+            } 
+
+            var desc = content.getElementsByClassName("shorttext")[0];
+            desc.classList.remove("shorttext");
+            desc.classList.add("fulltext");
+
+        }
+
+        function cross(cr){
+            // cr.style.color = "red";
+            var parent = cr.parentNode;
+            parent.classList.remove("active");
+            var children = parent.children;
+            var content = children[1];
+            children[2].style.display="none";
+            var todisplay = content.getElementsByClassName("removable");
+            for (var i = todisplay.length - 1; i >= 0; i--) {
+                todisplay[i].style.display="none";
+            } 
+
+            var desc = content.getElementsByClassName("fulltext")[0];
+            desc.classList.remove("fulltext");
+            desc.classList.add("shorttext");            
+        }
+
+        function resetForm(){
+            document.getElementById("keyword").value = "";
+            document.getElementById("row2").innerHTML = "";
+            document.getElementById("category").selectedIndex = 0;
+            if (document.getElementById("show_btn"))
+                document.getElementById("show_btn").remove();
+            getsources();
+            defaultdate();
+
+        }
+
+
+
+
+        function fetchresults() {
+                let searchform = document.getElementById( "searchform" );
+                const xhr = new XMLHttpRequest();
+                // Bind the FormData object and the form element
+                const fd = new FormData(searchform);
+                //alert(fd);
+                // Define what happens on successful data submission
+                xhr.addEventListener( "load", function(event) {
+                    //alert( event.target.responseText );
+                    showresults(JSON.parse(event.target.responseText));
+                } );
+
+                // Define what happens in case of error
+                xhr.addEventListener( "error", function( event ) {
+                  alert( 'Oops! Something went wrong.' );
+                } );
+
+                // Set up our request
+                xhr.open( "POST", "/searchdata" );
+
+                // The data sent is what the user provided in the form
+                xhr.send(fd);
+        }
+
+
+
+        function validationcheck()
+        {
+            var fromdate = new Date(document.getElementById("from").value);
+            var todate = new Date(document.getElementById("to").value);
+            //alert("HI")
+            // weekbefore();
+            if(fromdate > todate)
+            {
+                alert("Incorrect Time");
+                return false;
+            }
+            var currentdate = new Date();
+            //alert(currentdate);
+            if ((fromdate>currentdate) || (todate>currentdate))
+            {
+                alert("Incorrect Time");
+                return false;
+            }
+        }
+
+        function defaultdate()
+        {
+            var today = new Date();
+            var pastweek = new Date();
+            // alert("hello");
+            // alert(today);
+            //alert(today.getDate()-7);
+            p = today.getDate()-7;
+            pastweek.setDate(p);
+            //alert(pastweek);
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById("to").value = today;
+
+            var dd = String(pastweek.getDate()).padStart(2, '0');
+            var mm = String(pastweek.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = pastweek.getFullYear();
+            
+            pastweek = yyyy + '-' + mm + '-' + dd;
+            document.getElementById("from").value = pastweek;
+
+            // alert(today);
+            // alert(pastweek);
+            return today;
+        // document.write(today);
+        }
+
+
+        // function weekbefore()
+        // {
+        //     var ourDate = datetoday();
+            
+        //     //Change it so that it is 7 days in the past.
+        //     var pastDate = ourDate.getDate() - 7;
+        //     alert("Hi");
+        //     alert(pastDate);
+        //     ourDate.setDate(pastDate);
+             
+        //     //Log the date to our web console.
+            
+        //     document.getElementById("from").value = ourDate;
+        //     alert(ourDate);
+
+        // }
+
+
+        // <div class="card2 collapsible">
+                        
+        //                 <img src="https://dc95wa4w5yhv.cloudfront.net/image-cache/Daniel-6-lions-den_833_460_80_c1.jpg" alt="img1">
+                        
+        //                 <div class="content">
+        //                     <h2>Nature</h2>
+        //                     <p class = "removable"><span style="font-weight: bold">Author:</span>hblah</p>
+        //                     <p class = "removable"><span style="font-weight: bold">Source:</span>blah</p>
+        //                     <p class = "removabl"Removavblee" ><span style="font-weight: bold">Date:</span>blah</p>
+        //                     <p class="fulltext" "removable">What a beautiful sunrise What a beautiful sunrise What a beautiful sunriseWhat </p>
+        //                     <p class="shorttext">What a beautiful sunrise What a beautiful sunrise What a beautiful sunriseWhat </p>
+        //                     <a class = "removable" href="">See Original Post</a>
+        //                 </div>
+        //             </div>
+
+
+        function showresults(json)
+        {
+            if(json.hasOwnProperty('message')){
+                alert(json.message);
+                return;
+            }
+            var parent = document.getElementById("row2");
+            parent.innerHTML="";
+
+            // while (child) {
+            //     parent.removeChild(child);
+            //     child = parent.lastElementChild;
+            // }
+            var i;
+
+            if(json.length==0){
+                parent.innerHTML = "No Result";
+            }
+
+
+            for(i=0; i<json.length; i++){
+                var disp ="flex";
+                if(i>=5){
+                    disp="none";
+                }
+                var img = document.createElement("img");
+                img.setAttribute("src",json[i]["urlToImage"]);
+    
+                var h2 = document.createElement("h3");
+                var t = document.createTextNode(json[i]["title"]);
+                h2.appendChild(t);
+                
+                var p1 = document.createElement("p");
+                t = document.createTextNode(json[i]["author"]);
+                p1.classList.add("removable");
+                
+                var s1 = document.createElement("span");
+                s1.setAttribute("style","font-weight:bold");
+                s1.appendChild(document.createTextNode("Author:  "));
+                
+                p1.appendChild(s1);
+                p1.appendChild(t);
+                
+                var p2 = document.createElement("p");
+                t = document.createTextNode(json[i]["source"]["name"]);
+                p2.classList.add("removable");
+                var s2 = document.createElement("span");
+                s2.setAttribute("style","font-weight:bold");
+                s2.appendChild(document.createTextNode("Source:  "));
+                p2.appendChild(s2);
+                p2.appendChild(t);
+                
+                var p3 = document.createElement("p");
+                var x = json[i]["publishedAt"].split("T")[0].split("-");
+                t = document.createTextNode(x[1]+"/"+x[2]+'/'+x[0]);
+                var s3 = document.createElement("span");
+                p3.classList.add("removable");
+                s3.setAttribute("style","font-weight:bold");
+                s3.appendChild(document.createTextNode("Date:  "));
+                p3.appendChild(s3);
+                p3.appendChild(t);
+
+                var p4 = document.createElement("p");
+                var t = document.createTextNode(json[i]["description"]);
+                p4.appendChild(t);
+
+                p4.classList.add("shorttext");
+                
+
+                // var p5 = document.createElement("p");
+                // var t = document.createTextNode(json[i]["description"]);
+                // p5.appendChild(t);
+
+
+                var a = document.createElement("a");
+                a.setAttribute("href",json[i]["url"]);
+                a.setAttribute("target","_blank");
+                a.classList.add("removable");
+                a.appendChild(document.createTextNode("See Original Post"));
+                
+
+                var contentdiv = document.createElement("div");
+                contentdiv.classList.add("content");
+                contentdiv.appendChild(h2);
+                contentdiv.appendChild(p1);
+                contentdiv.appendChild(p2);
+                contentdiv.appendChild(p3);
+                contentdiv.appendChild(p4);
+                // contentdiv.appendChild(p5);
+                contentdiv.appendChild(a);
+
+                var cross = document.createElement("h3");
+                cross.innerHTML = '&times';
+                cross.setAttribute("onclick","event.stopPropagation();cross(this)");
+                cross.classList.add("cross");
+
+                var alldiv = document.createElement("div");
+                alldiv.classList.add("card2");
+                alldiv.style.display=disp;
+                alldiv.setAttribute("onclick","expand(this)");
+                
+                alldiv.appendChild(img);
+                alldiv.appendChild(contentdiv);
+                alldiv.appendChild(cross);
+                parent.appendChild(alldiv);
+
+                // var remicon = document.createElement("h2");
+                // remicon.innerHTML = '&times;';
+                // remicon.setAttribute("onclick","event.stopPropagation();remById(this)");
+
+                
+                // var card = document.createElement("div");
+                // card.classList.add("collapsible");
+                // card.classList.add("result_card");
+                // card.setAttribute("id","result_card_"+i.toString());
+                // card.setAttribute("onclick","expandById(this)");
+                // card.appendChild(imgbox);
+                // card.appendChild(showcontent);
+                // card.appendChild(remdiv);
+
+                // parent.appendChild(card);
+            }
+            if(json.length>5){
+                button = document.createElement("button");
+                button.classList.add("more_btn");
+                button.setAttribute("id","show_btn");
+                button.setAttribute("onclick","show(this)");
+                button.innerHTML="Show More";
+                parent = document.getElementById("search_results");
+                parent.appendChild(button);
+            }
+        }
+
+        function show(btn){
+            var txt = btn.innerHTML;
+            if(txt === "Show More"){
+                btn.innerHTML="Show Less";
+                var cards = document.getElementById("row2").children;
+                for (var i = 5; i < cards.length; i++) {
+                    cards[i].style.display="flex";
+                }
+            }
+            else{
+                btn.innerHTML="Show More";
+                var cards = document.getElementById("row2").children;
+                for (var i = 5; i < cards.length; i++) {
+                    cards[i].style.display="none";
+                }
+
+            }
+        }
+
+
+        function on_search_click() {
+            // alert("Hio");
+
+            var element = document.getElementById("b2");
+            element.classList.add("selected");
+            element= document.getElementById("b1");
+            element.classList.remove("selected");
+
+            var x = document.getElementById("upper");
+            x.style.display = "none";
+            x = document.getElementById("cnn");
+            x.style.display = "none";
+            x = document.getElementById("fox");
+            x.style.display = "none";
+            x = document.getElementById("pgsearch");
+            x.style.display = "block";
+            x = document.getElementById("search_results");
+            x.style.display = "block";
+            resetForm();
+
+        }
+
+        function on_news_click() {
+            // alert("Hi");
+            var element = document.getElementById("b1");
+            element.classList.add("selected");
+            element= document.getElementById("b2");
+            element.classList.remove("selected");
+
+            var x = document.getElementById("pgsearch");
+            x.style.display = "none";
+            x = document.getElementById("search_results");
+            x.style.display = "none";
+            x = document.getElementById("upper");
+            x.style.display = "block";
+            x = document.getElementById("cnn");
+            x.style.display = "block";
+            x = document.getElementById("fox");
+            x.style.display = "block";
+            location.reload();
+        }
+
+        function getsources() {
+            //alert("Change"+document.getElementById("category").value);
+            // var cat = document.getElementById("category");
+            var e = document.getElementById("source");
+            var cat = document.getElementById("category").value;
+            var child = e.lastElementChild;
+            while (child) {
+                e.removeChild(child);
+                child = e.lastElementChild;
+            }
+            var params = ""
+            if (cat !="all")
+            {
+                params="?cat="+cat;
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/dynamicsources"+params, true);
+            xhr.onload = function (e) {
+              if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                  // console.log(foxxhr.responseText);
+                  // alert(foxxhr.responseText);
+                  fillSources(JSON.parse(xhr.responseText));
+                  // showSlides(JSON.parse(cnnxhr.responseText));
+                } else {
+                  console.error(xhr.statusText);
+                }
+              }
+            };
+            xhr.onerror = function (e) {
+              console.error(xhr.statusText);
+            };
+            xhr.send(null);
+
+        }
+
+        function fillSources(json_data)
+        {
+            var src = document.getElementById("source");
+            // alert(fox_json_data.length);
+            var i ;
+            var opt = document.createElement("option");
+            opt.setAttribute("value","all");
+            var t = document.createTextNode("all");
+            opt.appendChild(t);
+            src.appendChild(opt);
+
+            for(i=0; i<json_data.length ; i++)
+            {
+                var opt = document.createElement("option");
+                opt.setAttribute("value",json_data[i].id);
+                var t = document.createTextNode(json_data[i].name);
+                opt.appendChild(t);
+                src.appendChild(opt);
+            }
+        }
+
+    </script>
+
+
+
+</head>
+<body onload="load()" >
+
+    <div class="col">
+        <div class ="col1">
+            <div class="buttongrp">
+                <button id="b1" class="selected" onclick="on_news_click()">Google News</button>
+                <button id="b2" onclick="on_search_click()">Search</button>
+            </div>
+        </div>
+        <div class="col2">
+            <div class="upper" id="upper" >
+                <div class="topnews" id="topnews">
+                </div>
+                <div class="wordcloud" id="cloud">
+                </div>
+            </div>
+
+            <div class="cnn" id="cnn" >
+                <h1>CNN</h1>
+                <hr>
+                <div class="row" id="cnnrow">
+                  <!-- <div class="column">
+                    <div class="card">
+                        <img src="https://dc95wa4w5yhv.cloudfront.net/image-cache/Daniel-6-lions-den_833_460_80_c1.jpg">
+                        <h2>Nature</h2>
+                        <p>What a beautiful sunrise What a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunrise</p>
+                    </div>
+                  </div>
+
+                  
+                  </div> -->
+                </div>
+
+            </div>
+            <div class="fox" id="fox" >
+                <h1>Fox News</h1>
+                <hr>
+                <div class="row" id="foxrow">
+<!--                   <div class="column">
+                    <div class="card">
+                        <img src="https://dc95wa4w5yhv.cloudfront.net/image-cache/Daniel-6-lions-den_833_460_80_c1.jpg">
+                        <h2>Nature</h2>
+                        <p>What a beautiful sunrise What a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunriseWhat a beautiful sunrise</p>
+                    </div>
+                  </div>
+
+                  </div> -->
+                </div>
+            </div>
+
+            <div class="pgsearch" id="pgsearch">
+                <form class="searchform" id="searchform" onsubmit="return validationcheck()">
+                  <div class="form_first_row">
+                      <label for="keyword"class="required" >Keyword</label>
+                      <input type="text" id="keyword" name="keyword" value="" required>
+                      <label for="from" class="required">From</label>
+                      <input type="date" id="from" name="from" value="" required>
+                      <label for="to" class="required" value="">To</label>
+                      <input type="date" id="to" name="to" value="" required>
+                </div>
+                <div class="form_second_row">
+                             <label for="category">Category</label>
+                              <select id="category" name="category" onchange="getsources()">
+                              <option value="all" selected="">all</option>
+                              <option value="business">business</option>
+                              <option value="entertainment">entertainment</option>
+                              <option value="general">general</option>
+                              <option value="health">health</option>
+                              <option value="science">science</option>
+                              <option value="sports">sports</option>
+                              <option value="technology">technology</option>
+                            </select>
+                            <label for="source">Source</label>
+                              <select id="source" name="sources">
+                             <!--  <option value="all" selected="">All</option>
+ --><!--                               <option value="business">Business</option>
+                              <option value="entertainment">Entertainment</option>
+                              <option value="general">General</option>
+                              <option value="health">Health</option>
+                              <option value="science">Science</option>
+                              <option value="sports">Sports</option>
+                              <option value="technology">Technology</option> -->
+                            </select>
+                </div>
+                  <div class="form_buttons">
+                      <button type="submit">Search</button>
+                      <button type="button" onclick="resetForm()">Clear</button>
+
+                </div>
+                </form>
+            </div>
+
+            <div class="search_results" id="search_results">
+
+                <div class="row2" id="row2">
+                 
+                </div>
+
+            </div>
+
+
+
+    </div>
+
+    </div>
+</body>
+
+
+</html>

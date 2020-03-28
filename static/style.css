@@ -1,0 +1,476 @@
+body{
+text-align:center;
+}
+
+/*Structure CSS*/
+
+.col{
+width:1050px;
+margin:auto;
+margin-top:35px;
+margin-bottom:50px;
+}
+
+.col1{
+width:16%;
+float: left;
+height:100%;
+font-size: 12px;
+
+}
+
+hr{
+  border-top:1px dotted black;
+  color:white;
+}
+
+.col2{
+width:82%;
+/*background-color: yellow;*/
+float:right;
+height:100%;
+margin-bottom: 50px;
+}
+
+/*Button CSS
+*/
+
+.buttongrp{
+	border: 1px solid #a5a2a2;
+	border-radius: 5px;
+	background-color: #a5a2a2;
+}
+#b1{
+	border-radius: 5px 5px 0px 0px;
+}
+
+#b2{
+	border-radius: 0px 0px 5px 5px ;
+}
+
+.buttongrp button {
+  background-color: #f2f2f2; /* Green background */
+  border:none;
+  color: black; /* White text */
+  padding: 10px 24px; /* Some padding */
+  cursor: pointer; /* Pointer/hand icon */
+  width: 100%; /* Set a width if needed */
+  display: block; /* Make the buttons appear below each other */
+  font-size: 20px;
+  font-family: "Georgia"
+}
+
+.buttongrp button:not(:last-child) {
+  border-bottom: none; /* Prevent double borders */
+}
+
+#b1.selected, #b2.selected {
+background-color: #555555;
+  color:white;
+  border-radius: 0px;	
+}
+
+#b2:hover, #b1:hover {
+  background-color: #67ac5c;
+  color:white;
+  border-radius: 0px;
+}
+
+/*Upper CSS*/
+
+.upper{
+	height:280px;
+	width:100%;
+
+}
+
+.topnews{
+	background-color: #f2f2f2;
+	width:55%;
+	float:left;
+	height:280px;
+  margin-left: 22px;
+  position: relative;
+}
+.wordcloud{
+	background-color: #f2f2f2;
+	width:38%;
+	float:right;
+	height:280px;
+  margin-right: 10px;
+}
+
+
+/*Lower CSS*/
+.cnn,.fox{
+margin-top:52px;
+}
+h1{
+	margin-bottom: 12px;
+}
+
+hr{
+	margin:0px;
+}
+
+/*slideshow
+*/
+
+
+/* Caption text */
+/*.text {
+  color: #f2f2f2;
+  font-size: 15px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;*/
+/*}*/
+
+
+
+.text-block {
+  position: absolute;
+  bottom: 0px;
+  /*right: 20px;*/
+  /*opacity: 0.6;*/
+  width:100%;
+  /*background-color: black;
+  */
+  background : rgba(0, 0, 0, 0.5);
+  color: white;
+  
+}
+
+.text-block h2{
+	margin: 3px 0px 6px 0px;
+	color: white;
+	font-family: "Georgia";
+
+}
+.text-block p{
+	margin: 6px 0px 10px 0px;
+	color: white;
+	font-family: "Georgia";
+}
+
+.mySlides{
+	width: 100%;
+	height:100%;
+  cursor: pointer;
+
+}
+
+.mySlides img{
+	position: relative;
+	width: 100%;
+	height:100%;
+	margin:auto;
+	vertical-align: middle;
+}
+
+
+
+/* Remove extra left and right margins, due to padding */
+.row {
+  display: flex;
+}
+
+
+
+
+/* Style the counter cards */
+.card {
+  /*box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.7);*/
+  border-style: solid;
+  border-color: rgb(85,85,85);
+  border-width: 1px 2px 2px 1px;
+  border-radius: 2px;
+  text-align: center;
+  background-color: #f1f1f1;
+  flex:1;
+  display: flex;
+  flex-direction: column;
+  max-width: 25%;
+  margin: 5px;
+  width:100%;
+  border-color: #a1a0a0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
+.card img{
+  /*height:35%;*/
+  width:100%;
+  min-height: 150px;
+  max-height: 150px;
+  /*border: ;*/
+  border-radius: 5px;
+}
+ .card h3{
+  margin-bottom: 0px;
+ }
+
+
+.pgsearch{
+  margin:0px;
+  background-color:#f3f3f3;
+  padding-bottom: 10px;
+  padding-top: 20px;
+  margin-left: 10px;
+  display: none;
+  /*height:100%;*/
+}
+
+.searchform{
+  width:100%;
+  height:100%;
+}
+
+.form_first_row, .form_second_row, .form_buttons{
+margin-top: 10px;
+margin-bottom: 10px;
+}
+
+.form_first_row
+{
+  display: inline-block;
+}
+
+.searchform label {
+  margin: 0px 6px 0px 6px;
+}
+
+.searchform input {
+  vertical-align: middle;
+  margin: 0px 6px 0px 6px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  height:14px;
+}
+
+.searchform button {
+  margin: 0px 10px 0px 10px;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border:none;
+  width: 80px;
+  font-size: 14px;
+}
+
+.searchform button:hover{
+    background-color: #67ac5c;
+    color: white;
+}
+
+.searchform select {
+  margin: 0px 6px 0px 6px;
+}
+/*.required label {
+    font-weight: bold;
+}*/
+
+.required:after {
+    color: red;
+    content: ' *';
+    display:inline;
+}
+
+.row2{
+  display: flex;
+  flex-direction: column;
+}
+.column2 {
+  /*float: left;*/
+  /*padding: 10px 7px;*/
+  /*display: flex;*/
+  /*flex: 1;*/
+}
+.card2 {
+  border-style: solid;
+  border-color: rgb(85,85,85);
+  border-width: 1px 2px 2px 1px;
+  border-radius: 2px;
+  background-color: #f1f1f1;
+  display: flex;
+  flex:1;
+  width:100%;
+  border-color: #a1a0a0;
+  border-radius: 5px;
+  height: 150px;
+  cursor: pointer;
+}
+
+.card2:hover, .active{
+  box-shadow: 3px 3px 5px 6px #ccc;
+}
+
+
+.card2 .content{
+    text-align: left;
+    margin-left: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+}
+
+.cross{
+  margin:10px;
+  font-weight: normal;
+  font-size: 25px;
+  width:4%;
+  height:100%;
+  cursor: pointer;
+  /*margin-top: 5px;*/
+  margin-right: 0px;
+  color: #4e2486;
+  /*float:right;*/
+  text-align: center;
+  display: none;
+}
+
+.cross:active{
+  color: red;
+}
+
+.content h3{
+  margin-bottom: 5px;
+ }
+
+ .content p{
+    margin-top:2px;
+    margin-bottom: 2px;
+ }
+
+.removable{
+  display: none;
+}
+
+
+.shorttext{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+}
+
+.fulltext{
+  white-space: normal;
+
+}
+
+/* style.css | http://localhost:5000/style.css */
+
+.pgsearch {
+  /* padding-top: 20px; */
+  /* margin-left: 10px; */
+  padding-top: 15px;
+  margin-left: 55px;
+  margin-right: 48px;
+}
+
+
+/* style.css | http://localhost:5000/style.css */
+
+.searchform input {
+  /* margin: 0px 6px 0px 6px; */
+  /* height: 14px; */
+  margin: 0px 30px 0px 6px;
+  height: 22px;
+}
+
+.searchform label {
+  /* margin: 0px 6px 0px 6px; */
+  margin: 0px 16px 0px 30px;
+}
+
+.more_btn{
+  margin: 0px 10px 0px 10px;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border:none;
+  width: 125px;
+  font-size: 14px;
+}
+
+.more_btn:hover{
+  background-color: #67ac5c;
+  color:white;
+}
+/* style_temp.css | file:///home/amitabh/Desktop/temp/style_temp.css */
+
+
+.search_results {
+  /* margin: ; */
+  /* margin-left: 82px; */
+  /* margin-right: 76px; */
+  width: 80%;
+  margin: auto;
+  display: none;
+
+}
+
+.pgsearch {
+  /* margin-left: 55px; */
+  /* margin-right: 48px; */
+  width: 90%;
+  margin: auto;
+}
+
+.pgsearch {
+  /* margin-left: 10px; */
+}
+
+.row2 {
+  margin-top: 25px;
+  /*margin-bottom: 15px;*/
+}
+
+.card2 {
+  /* width: 100%; */
+  width: inherit;
+  margin: 5px;
+}
+
+
+
+.searchform label {
+  /* margin: 0px 16px 0px 30px; */
+  margin: 0px 6px 0px 6px;
+}
+
+.searchform input {
+  /* margin: 0px 30px 0px 6px; */
+  margin: 0px 6px 0px 6px;
+  width: 150px;
+  padding: 5px;
+}
+
+.searchform input {
+  /* border: 1px solid #ddd; */
+  border: none;
+}
+
+.searchform select {
+  width: 150px;
+  text-align: center;
+}
+
+/* .searchform button { */
+
+
+/* Inline #3 | file:///home/amitabh/Desktop/temp/index_temp.html */
+
+.card2 img {
+  padding: 20px;
+  max-width: 80px;
+  max-height: 80px;
+  min-width: 80px;
+  min-height: 80px;
+
+
+}
+
